@@ -53,8 +53,10 @@ class ATSS:
         
         transforms = [
             ("Plain", lambda s: s),
-            ("ROT13", lambda s: codecs.encode(s, 'rot_13')),
+            ("ROT13", lambda s: codecs.encode(s, 'rot_13')) if (self.lang == "en") else None
         ]
+
+        transforms = [t for t in transforms if t is not None]
 
         for method, raw_string in candidates.items():
             for t_name, t_func in transforms:

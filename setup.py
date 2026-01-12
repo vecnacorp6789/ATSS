@@ -6,7 +6,7 @@ def readme():
 
 setup(
     name="atss",
-    version="0.2.1",
+    version="0.2.3",
     packages=find_packages(),
     entry_points={
         'console_scripts': [
