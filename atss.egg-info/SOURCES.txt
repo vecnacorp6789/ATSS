@@ -1,0 +1,13 @@
+README.md
+setup.cfg
+setup.py
+atss/__init__.py
+atss/cli.py
+atss/core.py
+atss/dictionary.py
+atss/strategies.py
+atss.egg-info/PKG-INFO
+atss.egg-info/SOURCES.txt
+atss.egg-info/dependency_links.txt
+atss.egg-info/entry_points.txt
+atss.egg-info/top_level.txt

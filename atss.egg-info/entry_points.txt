@@ -1,0 +1,2 @@
+[console_scripts]
+atss = atss.cli:main

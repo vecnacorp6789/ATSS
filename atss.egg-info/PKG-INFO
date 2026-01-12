@@ -1,0 +1,49 @@
+Metadata-Version: 2.4
+Name: atss
+Version: 0.2.1
+Summary: Library for analyzing acrostic texts for hidden messages
+Author: platon17
+Classifier: Programming Language :: Python :: 3.13
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+Dynamic: author
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: summary
+
+# ATSS_lib
+AcroText Steganography detection System
+ATSS — для автоматического обнаружения и извлечения скрытых сообщений (стеганографии) из текстовых файлов. Программа специализируется на поиске акростихов, телестихов, мезостихов и других паттернов, скрытых в структуре текста.
+
+ATSS применяет следующие методы к тексту (определены в atss/strategies.py):
+
+1. Первые буквы строк (Классический акростих).
+2. Последние буквы строк (Телестих).
+3. Вторые буквы строк (Мезостих, смещение 1).
+4. Третьи буквы строк (Мезостих, смещение 2).
+5. Первые буквы предложений (Учитывает . ! ?).
+6. Первые буквы второго слова (Для текстов с нумерацией или буллитами).
+7. Комбинация краев (Первая + Последняя буква строки).
+8. Анализ заголовка/хвоста (Анализ только первых или последних 50 строк текста для больших файлов).
+
+Пример использования: Скандальный рассказ "Пикалка" Леонида Каганова
+
+```python
+from atss import *
+
+atss_conf.defaults["ru"] = "ruwords.txt"
+atss_conf.defaults["min_length"] = 1
+
+a = ATSS(input_file="tests/data/ru-pikalka.txt")
+words = a.ex_words['Первые буквы строк']['text'].split()
+
+for w in words:
+    if len(w) >= 5:
+        print(w)
+
+"""
+Example usage of this program, this code extracts the hidden nazi message.
+"""
+```
