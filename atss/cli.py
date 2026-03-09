@@ -6,7 +6,7 @@ import json
 from .core import ATSS, atss_conf 
 
 
-def process_file(filepath, args):
+def process_file(filepath, args, effective_lang):
     if not os.path.exists(filepath):
         print(f"[ATSS] Файл '{filepath}' не найден.", file=sys.stderr)
         return None
@@ -15,14 +15,17 @@ def process_file(filepath, args):
         app = ATSS(
             input_file=filepath, 
             wordlist=args.wordlist, 
-            lang=args.lang,
+            lang=effective_lang,           # ← теперь правильный язык
             min_length=args.min_length,
             threshold=args.threshold,
+            caesar=args.caesar,            # ← новое
+            caesar_lang=args.caesar_lang,  # ← новое
         )
         return app
     except Exception as e:
         print(f"[ATSS] Ошибка при обработке '{filepath}': {e}", file=sys.stderr)
         return None
+    
 
 def print_text_report(filepath, app):
     print(f"\n=== Файл: {filepath} ===")
@@ -44,32 +47,36 @@ def print_text_report(filepath, app):
 def main():
     parser = argparse.ArgumentParser(description="ATSS: AcroText Steganography Solver")
     
-    # --- Mutually Exclusive Group (Main Modes) ---
     group = parser.add_mutually_exclusive_group(required=True)
-    
-    #файл
     group.add_argument("-in", "--input", dest="input_file",
-                        help="Путь к одному входному файлу (.txt) для анализа")
-    
-    #директория
+                        help="Путь к одному входному файлу (.txt)")
     group.add_argument("-d", "--directory", dest="directory",
-                        help="Путь к директории с файлами для пакетного анализа")
+                        help="Путь к директории с файлами")
 
-    #options
     parser.add_argument("-wl", "--wordlist", dest="wordlist", default=None,
                         help="Путь к файлу словаря")
     parser.add_argument("--lang", dest="lang", default="ru", choices=["ru", "en"],
-                        help="Язык анализа: 'ru' или 'en' (default: ru)")
-    
+                        help="Язык анализа (default: ru)")
     parser.add_argument("-ml", "--min-length", dest="min_length", type=int, default=5,
-                        help="Минимальная длина слова для валидации (default: 5)")
-
+                        help="Минимальная длина слова (default: 5)")
     parser.add_argument("--json", dest="json_output", action="store_true",
-                        help="Вывести результат анализа в формате JSON")
+                        help="Вывод в JSON")
     parser.add_argument("-s", "--threshold", dest="threshold", type=float, default=0.3,
-                        help="Пороговое значение для определения скрытых сообщений (default: 0.3)")
+                        help="Порог (default: 0.3)")
+
+    # === ЦЕЗАРЬ (уже должно быть, но на всякий случай) ===
+    parser.add_argument('--caesar', action='store_true',
+                        help='Проверять все сдвиги шифра Цезаря')
 
     args = parser.parse_args()
+    args.caesar_lang=args.lang
+    # === НОВОЕ: эффективный язык и проверка ===
+    if args.caesar and not args.caesar_lang:
+        parser.error('--caesar требует lang en или ru')
+
+    effective_lang = args.caesar_lang if args.caesar else args.lang
+    
+
 
     #analysis
     files_to_process = []
@@ -90,17 +97,17 @@ def main():
 
     json_results = []
     if not args.json_output:
-        print(f"--- ATSS Start | Lang: {args.lang} | MinLen: {args.min_length} | Files: {len(files_to_process)} ---")
+        print(f"--- ATSS Start | Lang: {effective_lang} | MinLen: {args.min_length} | Files: {len(files_to_process)} ---")
 
     for filepath in files_to_process:
-        app = process_file(filepath, args)
+        app = process_file(filepath, args, effective_lang)   # ← добавлен effective_lang
         if not app:
             continue
 
         if args.json_output:
             file_result = {
                 "file": filepath,
-                "language": args.lang,
+                "language": effective_lang,      # ← изменено
                 "min_length": args.min_length,
                 "found_messages": app.ex_words
             }
