@@ -27,19 +27,19 @@ class ATSS:
              input_file=None,
              directory=None,
              wordlist=None,
-             lang="ru",           # у тебя сейчас по умолчанию ru
-             min_length=5,        # ← обязательно!
+             lang="ru",
+             min_length=5,
              threshold=0,
              json=False,
-             caesar=False,        # ← новый
-             caesar_lang=None,    # ← новый
+             caesar=False,
+             caesar_lang=None,
              **kwargs):
 
         self.input_file = input_file
         self.directory = directory
         self.wordlist = wordlist
         self.lang = lang.lower()
-        self.min_length = min_length      # ← вот эта строка была пропущена/потерялась
+        self.min_length = min_length
         self.threshold = threshold
         self.json = json
         self.caesar = caesar
