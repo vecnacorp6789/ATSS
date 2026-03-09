@@ -15,11 +15,11 @@ def process_file(filepath, args, effective_lang):
         app = ATSS(
             input_file=filepath, 
             wordlist=args.wordlist, 
-            lang=effective_lang,           # ← теперь правильный язык
+            lang=effective_lang,
             min_length=args.min_length,
             threshold=args.threshold,
-            caesar=args.caesar,            # ← новое
-            caesar_lang=args.caesar_lang,  # ← новое
+            caesar=args.caesar,
+            caesar_lang=args.caesar_lang,
         )
         return app
     except Exception as e:
@@ -64,13 +64,11 @@ def main():
     parser.add_argument("-s", "--threshold", dest="threshold", type=float, default=0.3,
                         help="Порог (default: 0.3)")
 
-    # === ЦЕЗАРЬ (уже должно быть, но на всякий случай) ===
     parser.add_argument('--caesar', action='store_true',
                         help='Проверять все сдвиги шифра Цезаря')
 
     args = parser.parse_args()
     args.caesar_lang=args.lang
-    # === НОВОЕ: эффективный язык и проверка ===
     if args.caesar and not args.caesar_lang:
         parser.error('--caesar требует lang en или ru')
 
@@ -100,14 +98,14 @@ def main():
         print(f"--- ATSS Start | Lang: {effective_lang} | MinLen: {args.min_length} | Files: {len(files_to_process)} ---")
 
     for filepath in files_to_process:
-        app = process_file(filepath, args, effective_lang)   # ← добавлен effective_lang
+        app = process_file(filepath, args, effective_lang)
         if not app:
             continue
 
         if args.json_output:
             file_result = {
                 "file": filepath,
-                "language": effective_lang,      # ← изменено
+                "language": effective_lang,
                 "min_length": args.min_length,
                 "found_messages": app.ex_words
             }
